@@ -47,7 +47,7 @@ Install dependencies:
 
 sudo apt install build-essential manpages-dev
 sudo apt-get build-dep avahi
-sudp apt install python-gi-dev xml2man
+sudo apt install python-gi-dev xml2man
 
 Compile:
 
