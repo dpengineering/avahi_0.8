@@ -29,3 +29,27 @@ OHLOH:
 AUTHORS:
 	Lennart Poettering
 	Trent Lloyd
+
+----------------------------------------------------------------------------------
+
+Switch to port 5358
+
+Installation:
+
+git clone https://github.com/dpengineering/avahi_0.8
+
+Kill avahi-daemon:
+
+sudo systemctl stop avahi-daemon.service avahi-daemon.socket
+sudo apt purge avahi-daemon
+
+Install dependencies:
+
+sudo apt install build-essential manpages-dev
+sudo apt-get build-dep avahi
+sudp apt install python-gi-dev xml2man
+
+Compile:
+
+./autogen.sh && sudo make && sudo make install
+
