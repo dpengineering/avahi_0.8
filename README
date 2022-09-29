@@ -45,9 +45,9 @@ sudo apt purge avahi-daemon
 
 Install dependencies:
 
-sudo apt install build-essential manpages-dev
+sudo apt install build-essential manpages-dev libevent-dev qtbase5-dev mono-mcs
 sudo apt-get build-dep avahi
-sudo apt install python-gi-dev xml2man
+
 
 Compile:
 
