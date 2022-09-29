@@ -24,7 +24,7 @@
 
 #include "dns.h"
 
-#define AVAHI_MDNS_PORT 5353
+#define AVAHI_MDNS_PORT 5358
 #define AVAHI_DNS_PORT 53
 #define AVAHI_IPV4_MCAST_GROUP "224.0.0.251"
 #define AVAHI_IPV6_MCAST_GROUP "ff02::fb"
