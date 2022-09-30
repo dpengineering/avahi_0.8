@@ -48,6 +48,8 @@ Install dependencies:
 sudo apt install build-essential manpages-dev libevent-dev qtbase5-dev mono-mcs monodoc-http
 sudo apt-get build-dep avahi
 
+***If using POP!_OS disable avahi with***
+sudo  dpkg -P --force-depends 
 
 Compile:
 
