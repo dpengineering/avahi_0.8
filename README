@@ -53,3 +53,11 @@ Compile:
 
 ./autogen.sh && sudo make && sudo make install
 
+Check if avahi user is present and is a part of the group avahi:
+less /etc/passwd
+
+If not present add user,
+sudo adduser --disabled-password --quiet --system         --home /var/run/avahi-daemon         --gecos "Avahi mDNS daemon" --group avahi
+
+Add the dbus conf file:
+cp avahi-dbus.conf /etc/dbus-1/system.d/avahi-dbus.conf
