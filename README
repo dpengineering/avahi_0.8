@@ -39,27 +39,30 @@ Installation:
 git clone https://github.com/dpengineering/avahi_0.8
 
 Kill avahi-daemon:
-
+```
 sudo systemctl stop avahi-daemon.service avahi-daemon.socket
 sudo apt purge avahi-daemon
-
+```
 Install dependencies:
-
+```
 sudo apt install build-essential manpages-dev libevent-dev qtbase5-dev mono-mcs monodoc-http
 sudo apt-get build-dep avahi
-
-***If using POP!_OS disable avahi with***
-sudo  dpkg -P --force-depends 
-
+```
+*If sudp apt-get build-dep avahi throws an error along the lines of E: You must put some 'source' URIs in your sources.list run:
+```
+sudo cp /etc/apt/sources.list /etc/apt/sources.list~
+sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
+sudo apt-get update
+```
 Compile:
 
-./autogen.sh && sudo make && sudo make install
+`./autogen.sh && sudo make && sudo make install`
 
 Check if avahi user is present and is a part of the group avahi:
-less /etc/passwd
+`less /etc/passwd`
 
 If not present add user,
-sudo adduser --disabled-password --quiet --system         --home /var/run/avahi-daemon         --gecos "Avahi mDNS daemon" --group avahi
+`sudo adduser --disabled-password --quiet --system         --home /var/run/avahi-daemon         --gecos "Avahi mDNS daemon" --group avahi`
 
 Add the dbus conf file:
-cp avahi-dbus.conf /etc/dbus-1/system.d/avahi-dbus.conf
+`cp avahi-dbus.conf /etc/dbus-1/system.d/avahi-dbus.conf`
