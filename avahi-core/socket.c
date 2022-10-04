@@ -219,6 +219,8 @@ static int bind_with_warn(int fd, const struct sockaddr *sa, socklen_t l) {
             return -1;
     }
 
+    avahi_log_debug("Successfully bound to socket.");
+
     return 0;
 }
 

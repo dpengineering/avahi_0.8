@@ -17,7 +17,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 # USA.
 
-FLAGS="--sysconfdir=/etc --localstatedir=/var --enable-tests --enable-compat-howl --enable-compat-libdns_sd --disable-gtk3 --disable-gtk --disable-static --disable-mono --disable-monodoc --disable-python --disable-qt3 --disable-qt4"
+FLAGS="--sysconfdir=/etc --localstatedir=/var --enable-tests --enable-compat-howl --enable-compat-libdns_sd --disable-gtk3 --disable-gtk --disable-static --disable-mono --disable-monodoc --disable-python --disable-qt3 --disable-qt4 --disable-qt5"
 
 # Feel free to add your own custom flags in here -Lathiat
 
