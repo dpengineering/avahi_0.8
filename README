@@ -29,3 +29,28 @@ OHLOH:
 AUTHORS:
 	Lennart Poettering
 	Trent Lloyd
+
+## Installation 
+
+Disable avahi:
+'sudo systemctl stop avahi-daemon.socket avahi-daemon.service'
+'sudo systemctl disable avahi-daemon.socket avahi-daemon.service'
+'sudo apt purge avahi-daemon'
+
+Install Dependencies:
+'sudo apt install build-essential manpages-dev libevent-dev qtbase5-dev mono-mcs monodoc-http net-tools'
+'sudo apt-get build-dep avahi'
+
+* If apt-get build-dep avahi throws an error: *
+'sudo cp /etc/apt/sources.list /etc/apt/sources.list~'
+'sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list'
+'sudo apt-get update'
+
+Compile:
+'./autogen.sh && sudo make && sudo make install'
+
+Add user avahi if needed:
+'sudo adduser --disabled-password --quiet --system         --home /var/run/avahi-daemon         --gecos "Avahi mDNS daemon" --group avahi'
+
+Add the dbus conf file:
+'sudo cp avahi-dbus.conf /etc/dbus-1/system.d/avahi-dbus.conf'
