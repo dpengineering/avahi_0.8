@@ -36,8 +36,6 @@ Disable avahi:
 
 `sudo systemctl stop avahi-daemon.socket avahi-daemon.service`
 
-`sudo systemctl disable avahi-daemon.socket avahi-daemon.service`
-
 `sudo apt purge avahi-daemon`
 
 Install Dependencies:
@@ -60,8 +58,6 @@ Compile:
 `./autogen.sh && sudo make && sudo make install`
 
 Enable avahi:
-
-`sudo systemctl enable avahi-daemon.socket avahi-daemon.service`
 
 `sudo systemctl start avahi-daemon.socket avahi-daemon.service`
 
