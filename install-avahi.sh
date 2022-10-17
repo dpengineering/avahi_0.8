@@ -4,7 +4,7 @@
 systemctl stop avahi-daemon.socket avahi-daemon.socket
 
 #purge avahi
-apt purge avahi
+apt purge -y avahi-daemon
 
 #install dependencies
 apt install -y gettext intltool libtool libglib2.0-dev libgdbm-dev libdaemon-dev libdbus-1-dev manpages-dev libevent-dev qtbase5-dev mono-mcs monodoc-http xmltoman
@@ -33,5 +33,3 @@ cp avahi-dbus.conf /etc/dbus-1/system.d/avahi-dbus.conf
 systemctl daemon-reload
 systemctl start avahi-daemon
 systemctl enable avahi-daemon
-
-reboot
