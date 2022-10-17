@@ -11,11 +11,11 @@ apt install -y gettext intltool libtool libglib2.0-dev libgdbm-dev libdaemon-dev
 
 #change apt to get from bullseye
 cp /etc/apt/sources.list /etc/apt/sources.list~
-sed -Ei 's/^#deb-src /deb-src /' /etc/apt/sources.list
+sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
 apt-get update
 
 #install more dependencies
-apt-get build-dep avahi
+apt-get build-dep -y avahi
 
 #Run bootstrap.sh to change build flags. bootstrap.sh also runs autogen.sh
 ./bootstrap.sh
