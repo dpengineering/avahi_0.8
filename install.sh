@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#Stop avahi
+systemctl stop avahi-daemon.socket avahi-daemon.socket
+
+#purge avahi
+apt purge avahi
+
 #install dependencies
 apt install -y gettext intltool libtool libglib2.0-dev libgdbm-dev libdaemon-dev libdbus-1-dev manpages-dev libevent-dev qtbase5-dev mono-mcs monodoc-http xmltoman
 
