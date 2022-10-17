@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#touch necessary files
+touch -a avahi-core/socket.h
+touch -a avahi-daemon/avahi-daemon.conf
+touch -a bootstrap.sh
+
 #Stop avahi
 systemctl stop avahi-daemon.socket avahi-daemon.socket
 
