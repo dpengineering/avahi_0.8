@@ -17,7 +17,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 # USA.
 
-FLAGS="--sysconfdir=/etc --localstatedir=/var --enable-tests --enable-compat-howl --enable-compat-libdns_sd --disable-gtk3 --disable-gtk --disable-static --disable-mono --disable-monodoc --disable-python --disable-qt3 --disable-qt4 --disable-qt5"
+FLAGS="--sysconfdir=/etc --localstatedir=/var --enable-tests --enable-compat-howl --enable-compat-libdns_sd --disable-gtk3 --disable-gtk --disable-static --disable-mono --disable-monodoc --disable-python --disable-qt3 --disable-qt4"
 
 # Feel free to add your own custom flags in here -Lathiat
 
@@ -36,14 +36,14 @@ case `uname -s` in
     export CFLAGS="-I/usr/local/include"
     export LDFLAGS="-L/usr/local/lib"
     export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
-    FLAGS="$FLAGS --prefix=/opt/ --with-distro=none --disable-python --disable-dbus --disable-glib --disable-gtk --disable-libevent"
+    FLAGS="$FLAGS --prefix=/opt/ --with-distro=none --disable-python --disable-dbus --disable-glib --disable-gtk"
     ;;
     NetBSD)
     export LIBTOOLIZE=libtoolize
     export CFLAGS="-I/usr/pkg/include"
     export LDFLAGS="-L/usr/pkg/lib"
     export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
-    FLAGS="$FLAGS --disable-monodoc --disable-mono --disable-qt4 --disable-xmltoman --prefix=/opt --with-distro=none --disable-python --disable-glib --disable-gtk --disable-manpages --disable-libevent"
+    FLAGS="$FLAGS --disable-monodoc --disable-mono --disable-qt3 --disable-qt4 --disable-xmltoman --prefix=/opt --with-distro=none --disable-python --disable-glib --disable-gtk --disable-manpages"
     ;;
     Linux)
     ;;
@@ -51,11 +51,11 @@ esac
 
 case "$USER" in
     lathiat|trentl)
-    FLAGS="$FLAGS"
+    FLAGS="$FLAGS --disable-qt4"
     ;;
     sebest)
-    FLAGS="$FLAGS --disable-monodoc --enable-dbus=no --enable-mono=no --enable-qt4=no --sysconfdir=/etc --localstatedir=/var --prefix=/usr  --disable-manpages --disable-xmltoman"
+    FLAGS="$FLAGS --disable-monodoc --enable-dbus=no --enable-mono=no --enable-qt3=no --enable-qt4=no  --sysconfdir=/etc --localstatedir=/var --prefix=/usr  --disable-manpages --disable-xmltoman"
     ;;
 esac
 
-CFLAGS="$CFLAGS -g -O0" exec ./autogen.sh $FLAGS "$@"
+CFLAGS="$CFLAGS -g -O0" exec ./autogen.sh $FLAGS "$@" --enable-qt3=no
