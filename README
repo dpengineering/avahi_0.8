@@ -29,9 +29,3 @@ OHLOH:
 AUTHORS:
 	Lennart Poettering
 	Trent Lloyd
-
-## Installation 
-```
-sudo apt install build-essential
-sudo ./install.sh
-```

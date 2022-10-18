@@ -1,40 +1,33 @@
 #!/bin/bash
 
-#touch necessary files
-touch -a avahi-core/socket.h
-touch -a avahi-daemon/avahi-daemon.conf
-touch -a bootstrap.sh
+#Disable Avahi
+systemctl stop avahi-daemon.socket avahi-daemon.service
+apt purge avahi-daemon
 
-#Stop avahi
-systemctl stop avahi-daemon.socket avahi-daemon.socket
-
-#purge avahi
-apt purge -y avahi-daemon
-
-#install dependencies
-apt install -y gettext intltool libtool libglib2.0-dev libgdbm-dev libdaemon-dev libdbus-1-dev manpages-dev libevent-dev qtbase5-dev mono-mcs monodoc-http xmltoman
-
-#change apt to get from bullseye
+#Switch apt-get method
 cp /etc/apt/sources.list /etc/apt/sources.list~
-sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
+sed -Ei 's/#deb-src /deb-src /' /etc/apt/sources.list
 apt-get update
 
-#install more dependencies
+#Install Dependencies
 apt-get build-dep -y avahi
+apt install -y libevent-dev qtbase5-dev mono-mcs monodoc-http
 
-#Run bootstrap.sh to change build flags. bootstrap.sh also runs autogen.sh
+#Build Avahi
 ./bootstrap.sh
-
-#install avahi
+make
 make install
+
+#Find Libraries
+/sbin/ldconfig -v
 
 #Add avahi user
 adduser --disabled-password --quiet --system --home /var/run/avahi-daemon --gecos "Avahi mDNS daemon" --group avahi
-
-#Add avahi-dbus.conf to dbus
-cp avahi-dbus.conf /etc/dbus-1/system.d/avahi-dbus.conf
 
 #Start avahi
 systemctl daemon-reload
 systemctl start avahi-daemon
 systemctl enable avahi-daemon
+
+reboot
+
