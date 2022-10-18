@@ -2,11 +2,13 @@
 
 #Disable Avahi
 systemctl stop avahi-daemon.socket avahi-daemon.service
-apt purge avahi-daemon
+apt purge -y avahi-daemon
 
 #Switch apt-get method
 cp /etc/apt/sources.list /etc/apt/sources.list~
 sed -Ei 's/#deb-src /deb-src /' /etc/apt/sources.list
+#For Ubuntu:
+#sed -Ei 's/# deb-src /deb-src /' /etc/apt/sources.list
 apt-get update
 
 #Install Dependencies

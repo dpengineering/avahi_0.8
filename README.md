@@ -29,3 +29,11 @@ OHLOH:
 AUTHORS:
 	Lennart Poettering
 	Trent Lloyd
+
+-----------------------------------------------------------------
+# Installation
+
+```
+sudo apt install build-essential
+./install-avahi.sh
+```
