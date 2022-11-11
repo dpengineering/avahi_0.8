@@ -17,9 +17,6 @@ MAILING LIST:
 IRC:
 	#avahi on irc.freenode.org
 
-CIA:
-	http://cia.navi.cx/stats/project/avahi
-
 FRESHMEAT:
 	http://freshmeat.net/projects/avahi/
 
