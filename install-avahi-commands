@@ -1,0 +1,35 @@
+# Disable Avahi
+sudo systemctl stop avahi-daemon.socket avahi-daemon.service
+sudo apt purge -y avahi-daemon
+
+# Switch apt-get method
+sudo cp /etc/apt/sources.list /etc/apt/sources.list~
+sudo sed -Ei 's/#deb-src /deb-src /' /etc/apt/sources.list
+
+# For Ubuntu:
+# sed -Ei 's/# deb-src /deb-src /' /etc/apt/sources.list
+sudo apt-get update
+
+# Install Dependencies
+sudo apt-get build-dep -y avahi
+sudo apt install -y libevent-dev qtbase5-dev mono-mcs monodoc-http
+
+# Build Avahi
+sudo ./bootstrap.sh
+sudo make
+sudo make install
+
+# Find Libraries
+sudo /sbin/ldconfig -v
+
+# Add avahi user
+sudo adduser --disabled-password --quiet --system --home /var/run/avahi-daemon --gecos "Avahi mDNS daemon" --group avahi
+
+# Start avahi
+sudo systemctl daemon-reload
+sudo systemctl start avahi-daemon
+sudo systemctl enable avahi-daemon
+
+sudo reboot
+
+
