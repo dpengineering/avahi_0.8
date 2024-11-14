@@ -1,9 +1,21 @@
 # Disable Avahi
-sudo systemctl stop avahi-daemon.socket avahi-daemon.service
+sudo systemctl stop avahi-daemon.socket avahi-daemon.service avahi-daemon
+sudo systemctl disable avahi-daemon.socket avahi-daemon.service avahi-daemon
 sudo apt purge -y avahi-daemon
+
+# If Purge Not Purging Avahi
+sudo find / -path "/home" -prune -o -name "*avahi*" -print 2>/dev/null ### Locate All Files and Directories Containing "avahi"
+sudo find / -path "/home/pi" -prune -o -name "*avahi*" -exec rm -rf {} + 2>/dev/null ### Delete All Found Files and Directories
+sudo apt purge avahi* -y ### Remove Any avahi Packages
+
 
 # Switch apt-get method
 sudo cp /etc/apt/sources.list /etc/apt/sources.list~
+
+# Remove "#" infront of deb-src
+sudo nano /etc/apt/sources.list
+
+# Do if removing "#" doesn't work
 sudo sed -Ei 's/#deb-src /deb-src /' /etc/apt/sources.list
 
 # For Ubuntu:
@@ -30,6 +42,21 @@ sudo systemctl daemon-reload
 sudo systemctl start avahi-daemon
 sudo systemctl enable avahi-daemon
 
+***
+
+# If Systemctl Enable Not Working
+sudo nano /etc/init.d/avahi-daemon
+
+## add: 
+### BEGIN INIT INFO
+# Default-Start: 2 3 4 5
+### END INIT INFO
+
+***
+
+# Reboot Time
 sudo reboot
 
-
+# Check If Changed
+netstat -lntu | grep 5353 ### Should have no output
+netstat -lntu | grep 5358 ### Should have a output
