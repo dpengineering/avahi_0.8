@@ -4,9 +4,15 @@ sudo systemctl disable avahi-daemon.socket avahi-daemon.service avahi-daemon
 sudo apt purge -y avahi-daemon
 
 # If Purge Not Purging Avahi
-sudo find / -path "/home" -prune -o -name "*avahi*" -print 2>/dev/null ### Locate All Files and Directories Containing "avahi"
-sudo find / -path "/home/pi" -prune -o -name "*avahi*" -exec rm -rf {} + 2>/dev/null ### Delete All Found Files and Directories
-sudo apt purge avahi* -y ### Remove Any avahi Packages
+
+### Locate All Files and Directories Containing "avahi"
+sudo find / -path "/home" -prune -o -name "*avahi*" -print 2>/dev/null 
+
+### Delete All Found Files and Directories
+sudo find / -path "/home/pi" -prune -o -name "*avahi*" -exec rm -rf {} + 2>/dev/null 
+
+### Remove Any avahi Packages
+sudo apt purge avahi* -y
 
 
 # Switch apt-get method
