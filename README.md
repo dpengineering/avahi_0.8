@@ -49,3 +49,10 @@ sudo apt install avahi-daemon # When prompted, use own config (most likely optio
 echo "avahi-daemon hold" | sudo dpkg --set-selections # Paul recomends making sure that any future updates to avahi-daemon do not overide this custom implementation (Basically - Put the package on hold)
 reboot
 ```
+
+To check that Avahi is working properly, you can use:
+```
+systemctl status avahi-daemon # This should show no errors
+avahi-browse --all --resolve # You should be able to see local Pi's if it is working correctly
+```
+	
