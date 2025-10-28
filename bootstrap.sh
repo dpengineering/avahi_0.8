@@ -46,6 +46,7 @@ case `uname -s` in
     FLAGS="$FLAGS --disable-monodoc --disable-mono --disable-qt4 --disable-xmltoman --prefix=/opt --with-distro=none --disable-python --disable-glib --disable-gtk --disable-manpages --disable-libevent"
     ;;
     Linux)
+    FLAGS="$FLAGS --disable-python --disable-pygobject --disable-mono --disable-xmltoman --disable-manpages"
     ;;
 esac
 
