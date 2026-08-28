@@ -28,6 +28,50 @@ AUTHORS:
 	Trent Lloyd
 
 -----------------------------------------------------------------
+# Installation from the prebuilt .deb (recommended)
+
+This repo auto-builds the patched avahi. On every change to `main`, CI builds it
+(mDNS on port 5358) as an arm64 `.deb` inside a Debian Bookworm container and
+publishes it to this repo's latest GitHub Release. Pull requests build the same
+`.deb` as a merge gate, so `main` stays buildable. You do not have to compile on
+the Pi. The download URL is stable:
+
+    https://github.com/dpengineering/avahi_0.8/releases/latest/download/avahi-dpea_0.8_arm64.deb
+
+Run these on a 64-bit Raspberry Pi OS (Bookworm or newer) desktop image:
+
+```
+# 1. Remove the stock avahi so its files no longer own the /usr paths
+sudo systemctl stop avahi-daemon.socket avahi-daemon.service
+sudo systemctl disable avahi-daemon.socket avahi-daemon.service
+sudo apt purge -y avahi-daemon
+
+# 2. Make sure the avahi runtime user still exists (purge can remove it)
+sudo adduser --disabled-password --quiet --system --home /var/run/avahi-daemon --gecos "Avahi mDNS daemon" --group avahi 2>/dev/null || true
+
+# 3. Download and install the prebuilt patched (port 5358) avahi
+wget https://github.com/dpengineering/avahi_0.8/releases/latest/download/avahi-dpea_0.8_arm64.deb
+sudo dpkg -i avahi-dpea_0.8_arm64.deb
+sudo apt-get -f install -y   # only if dpkg reports missing dependencies
+sudo /sbin/ldconfig
+
+# 4. Start it, and hold so apt upgrades do not overwrite the custom build
+sudo systemctl daemon-reload
+sudo systemctl restart avahi-daemon
+echo "avahi-dpea hold" | sudo dpkg --set-selections
+reboot
+```
+
+To confirm it is working:
+```
+systemctl status avahi-daemon        # should show no errors
+avahi-browse --all --resolve         # should list local Pis
+```
+
+The sections below build from source by hand instead. The prebuilt `.deb` above
+is the recommended path and is exactly what CI produces.
+
+-----------------------------------------------------------------
 # Installation on Ubuntu
 
 ```
