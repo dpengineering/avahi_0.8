@@ -64,17 +64,30 @@ jobs:
         run: |
           # bootstrap.sh forwards trailing args to configure, so --prefix=/usr
           # lands the install on the stock avahi paths without editing avahi.
+          # --libdir puts the shared libs on the arm64 multiarch path where stock
+          # avahi keeps them, so the patched libavahi-core (mDNS on 5358) overwrites
+          # the stock lib in place. Without it the libs land in /usr/lib and the
+          # daemon can load the stock 5353 lib from the multiarch dir instead.
           # Disable the Qt5 and mono bindings: bootstrap.sh does not disable them
           # and build-dep avahi does not supply them, so configure would hard-error.
           # The daemon and the stock Pi OS avahi footprint do not need them.
-          ./bootstrap.sh --prefix=/usr --disable-qt5 --disable-mono --disable-monodoc
+          ./bootstrap.sh --prefix=/usr --libdir=/usr/lib/aarch64-linux-gnu \
+            --disable-qt5 --disable-mono --disable-monodoc
           make -j"$(nproc)"
           # --fstrans=no disables checkinstall's installwatch path-translation,
           # which is broken on modern arm64/glibc (make install fails with
           # "chmod: cannot access .../libavahi-common.a"). We are root in a
           # throwaway container, so installing to the real FS is fine.
+          # The stock RPi OS base already has avahi installed, so this .deb must be
+          # allowed to overwrite those packages' files. Replaces: (without Conflicts:)
+          # lets dpkg hand file ownership to avahi-dpea while the stock lib packages
+          # stay installed to satisfy other packages' versioned deps. Provides:
+          # avahi-daemon keeps libnss-mdns's dependency satisfied. Listing packages
+          # that are not present on a given base is harmless.
           checkinstall --pkgname=avahi-dpea --pkgversion=0.8 --pkgarch=arm64 \
-            --provides=avahi-daemon --fstrans=no --default --nodoc make install
+            --provides=avahi-daemon \
+            --replaces="avahi-daemon,avahi-utils,avahi-autoipd,avahi-dnsconfd,avahi-discover,avahi-ui-utils,libavahi-client3,libavahi-common3,libavahi-common-data,libavahi-core7,libavahi-glib1,libavahi-gobject0,libavahi-ui-gtk3-0,libavahi-compat-libdnssd1,gir1.2-avahi-0.6,libavahi-client-dev,libavahi-common-dev,libavahi-core-dev,libavahi-glib-dev,libavahi-gobject-dev,libavahi-compat-libdnssd-dev,libavahi-ui-gtk3-dev" \
+            --fstrans=no --default --nodoc make install
           # normalize to a constant asset name (checkinstall's filename can vary)
           cp "$(ls avahi-dpea*_arm64.deb | head -1)" avahi-dpea_0.8_arm64.deb
           ls -la avahi-dpea_0.8_arm64.deb
@@ -86,8 +99,49 @@ jobs:
           path: avahi-dpea_0.8_arm64.deb
           if-no-files-found: error
 
-  release:
+  verify-install:
     needs: build
+    # Prove the .deb installs OVER a stock avahi, which the real RPi OS Desktop
+    # base already carries. The build container is bare, so this is the gate that
+    # catches a missing Replaces: or a wrong libdir before the .deb ever ships.
+    runs-on: ubuntu-24.04-arm
+    container: debian:trixie
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: avahi-deb
+      - name: Install over stock avahi and assert
+        run: |
+          set -euo pipefail
+          apt-get update
+          # the stock avahi stack the real image base already has
+          apt-get install -y avahi-daemon libnss-mdns iproute2 procps dbus
+          # must succeed despite the file overlap (this is what failed before)
+          apt-get install -y ./avahi-dpea_0.8_arm64.deb
+          dpkg -s avahi-dpea >/dev/null 2>&1 \
+            || { echo "FAIL avahi-dpea did not install"; exit 1; }
+          # Replaces: must hand the stock daemon binary to avahi-dpea, not leave two
+          dpkg -S /usr/sbin/avahi-daemon | grep -q '^avahi-dpea:' \
+            || { echo "FAIL /usr/sbin/avahi-daemon not owned by avahi-dpea"; dpkg -S /usr/sbin/avahi-daemon; exit 1; }
+          echo "OK   avahi-dpea installed over stock and owns the daemon binary"
+          # where the 5358 patch lives; informational (soname path can vary by build)
+          dpkg -S /usr/lib/aarch64-linux-gnu/libavahi-core.so.7 2>/dev/null || true
+          # best-effort port check: the patched daemon should bind 5358, never 5353.
+          # A container may block multicast so the daemon may not fully start; only
+          # FAIL if it actually came up on the stock 5353 port.
+          ldconfig
+          (service dbus start >/dev/null 2>&1 || true; avahi-daemon -D >/dev/null 2>&1 || true; sleep 2)
+          if ss -lun 2>/dev/null | grep -q ':5358'; then
+            echo "OK   daemon bound 5358"
+          elif ss -lun 2>/dev/null | grep -q ':5353'; then
+            echo "FAIL daemon bound the stock 5353 port"; exit 1
+          else
+            echo "WARN could not confirm the port in-container (verify on hardware)"
+          fi
+
+  release:
+    needs: [build, verify-install]
     # never publish a Release from a PR build; only from push to main / dispatch
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04-arm
