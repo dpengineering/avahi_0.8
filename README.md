@@ -31,14 +31,14 @@ AUTHORS:
 # Installation from the prebuilt .deb (recommended)
 
 This repo auto-builds the patched avahi. On every change to `main`, CI builds it
-(mDNS on port 5358) as an arm64 `.deb` inside a Debian Bookworm container and
+(mDNS on port 5358) as an arm64 `.deb` inside a Debian Trixie container and
 publishes it to this repo's latest GitHub Release. Pull requests build the same
 `.deb` as a merge gate, so `main` stays buildable. You do not have to compile on
 the Pi. The download URL is stable:
 
     https://github.com/dpengineering/avahi_0.8/releases/latest/download/avahi-dpea_0.8_arm64.deb
 
-Run these on a 64-bit Raspberry Pi OS (Bookworm or newer) desktop image:
+Run these on a 64-bit Raspberry Pi OS (Trixie) desktop image:
 
 ```
 # 1. Remove the stock avahi so its files no longer own the /usr paths
