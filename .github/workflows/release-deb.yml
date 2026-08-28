@@ -1,5 +1,6 @@
-# Build + publish the patched 5358 avahi as an arm64 .deb on every source change.
-# Docs/README edits are ignored. Publishes to this repo's latest Release under a
+# Build + publish the patched 5358 avahi as an arm64 .deb.
+# Every PR builds the .deb as a merge gate, so a broken build never reaches main.
+# A push to main rebuilds it and publishes to this repo's latest Release under a
 # constant asset name, so consumers pull:
 #   https://github.com/dpengineering/avahi_0.8/releases/latest/download/avahi-dpea_0.8_arm64.deb
 #
@@ -10,6 +11,8 @@
 name: release-deb
 
 on:
+  # Publish from main: rebuild, then attach the .deb to the latest Release.
+  # Doc-only pushes are skipped so they do not republish.
   push:
     branches: [main]
     paths-ignore:
@@ -19,16 +22,10 @@ on:
       - 'LICENSE*'
       - 'NEWS*'
       - 'AUTHORS*'
-  # TEMPORARY: build on PRs too, so the build can be validated before merge.
-  # Remove this pull_request block before merging so PRs stop building.
+  # Build on every PR as the merge gate: a broken build never reaches main.
+  # No paths-ignore here so the gate always runs; make the "build" job a
+  # required status check in branch protection to enforce it.
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'README*'
-      - 'LICENSE*'
-      - 'NEWS*'
-      - 'AUTHORS*'
   workflow_dispatch:
 
 permissions:
