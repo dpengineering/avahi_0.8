@@ -4,9 +4,9 @@
 # constant asset name, so consumers pull:
 #   https://github.com/dpengineering/avahi_0.8/releases/latest/download/avahi-dpea_0.8_arm64.deb
 #
-# The build runs inside a Debian Bookworm arm64 container on a native arm64
-# runner, so the binaries link against Bookworm's glibc and run on a
-# 64-bit Raspberry Pi OS (Bookworm) desktop image unchanged.
+# The build runs inside a Debian Trixie arm64 container on a native arm64
+# runner, so the binaries link against Trixie's glibc and run on a
+# 64-bit Raspberry Pi OS (Trixie) desktop image unchanged.
 
 name: release-deb
 
@@ -34,7 +34,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    container: debian:bookworm
+    container: debian:trixie
     steps:
       - name: Install git for checkout
         run: |
@@ -45,7 +45,7 @@ jobs:
 
       - name: Install build deps
         run: |
-          # Bookworm ships avahi 0.8, so build-dep pulls almost every dep this
+          # Trixie ships avahi, so build-dep pulls almost every dep this
           # source needs. Enable deb-src first.
           if [ -f /etc/apt/sources.list.d/debian.sources ]; then
             sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
