@@ -19,6 +19,16 @@ on:
       - 'LICENSE*'
       - 'NEWS*'
       - 'AUTHORS*'
+  # TEMPORARY: build on PRs too, so the build can be validated before merge.
+  # Remove this pull_request block before merging so PRs stop building.
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - 'NEWS*'
+      - 'AUTHORS*'
   workflow_dispatch:
 
 permissions:
@@ -38,7 +48,7 @@ jobs:
 
       - name: Install build deps
         run: |
-          # Bookworm ships avahi 0.8, so build-dep pulls exactly the deps this
+          # Bookworm ships avahi 0.8, so build-dep pulls almost every dep this
           # source needs. Enable deb-src first.
           if [ -f /etc/apt/sources.list.d/debian.sources ]; then
             sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
@@ -48,16 +58,26 @@ jobs:
           fi
           apt-get update
           apt-get build-dep -y avahi
-          apt-get install -y build-essential checkinstall pkg-config
+          # libevent-dev is not in avahi's Debian build-deps (that package skips
+          # the libevent binding), but bootstrap.sh does not disable it, so
+          # configure hard-errors without it. Install it explicitly.
+          apt-get install -y build-essential checkinstall pkg-config libevent-dev
 
       - name: Build .deb
         run: |
           # bootstrap.sh forwards trailing args to configure, so --prefix=/usr
           # lands the install on the stock avahi paths without editing avahi.
-          ./bootstrap.sh --prefix=/usr
+          # Disable the Qt5 and mono bindings: bootstrap.sh does not disable them
+          # and build-dep avahi does not supply them, so configure would hard-error.
+          # The daemon and the stock Pi OS avahi footprint do not need them.
+          ./bootstrap.sh --prefix=/usr --disable-qt5 --disable-mono --disable-monodoc
           make -j"$(nproc)"
+          # --fstrans=no disables checkinstall's installwatch path-translation,
+          # which is broken on modern arm64/glibc (make install fails with
+          # "chmod: cannot access .../libavahi-common.a"). We are root in a
+          # throwaway container, so installing to the real FS is fine.
           checkinstall --pkgname=avahi-dpea --pkgversion=0.8 --pkgarch=arm64 \
-            --provides=avahi-daemon --default --nodoc make install
+            --provides=avahi-daemon --fstrans=no --default --nodoc make install
           # normalize to a constant asset name (checkinstall's filename can vary)
           cp "$(ls avahi-dpea*_arm64.deb | head -1)" avahi-dpea_0.8_arm64.deb
           ls -la avahi-dpea_0.8_arm64.deb
@@ -71,6 +91,8 @@ jobs:
 
   release:
     needs: build
+    # never publish a Release from a PR build; only from push to main / dispatch
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Download build artifact
